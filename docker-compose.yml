@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  db:
+    container_name: "db_api_marvel"
+    image: "postgres:16.2-alpine"
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: "api_marvel"
+      POSTGRES_PASSWORD: "api_marvel"
+      POSTGRES_DB: "api_marvel"
