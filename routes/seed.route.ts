@@ -5,6 +5,7 @@ import { errorMiddleware } from '../src/shared/middlewares/error.middleware'
 const seedRoutes = Router()
 
 seedRoutes.post('/seed', new SeedController().seed)
+seedRoutes.post('/reset', new SeedController().reset)
 
 seedRoutes.use(errorMiddleware)
 

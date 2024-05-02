@@ -6,11 +6,14 @@ export class Character {
   id: number;
 
   @Column()
+  resourceURI: string;
+
+  @Column()
   name: string;
 
   @Column()
-  description: string;
+  serieId: number;
 
   @Column()
-  image_url: string;
+  characterId: number;
 }

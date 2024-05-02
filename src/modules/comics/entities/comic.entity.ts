@@ -6,14 +6,14 @@ export class Comic {
   id: number;
 
   @Column()
-  title: string;
+  resourceURI: string;
 
   @Column()
-  description: string;
+  name: string;
 
   @Column()
-  published_at: Date;
+  serieId: number;
 
   @Column()
-  cover_url: string;
+  comicId: number;
 }

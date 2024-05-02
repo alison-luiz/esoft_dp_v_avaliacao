@@ -1,22 +1,25 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
-export class Creator {
+export class Serie {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @Column()
-  resourceURI: string;
-
-  @Column()
-  name: string;
-
-  @Column()
-  role: string;
 
   @Column()
   serieId: number;
 
   @Column()
-  creatorId: number;
+  title: string;
+
+  @Column({ nullable: true})
+  description: string;
+
+  @Column()
+  startYear: number;
+
+  @Column()
+  endYear: number;
+
+  @Column()
+  thumbnailPath: string;
 }
