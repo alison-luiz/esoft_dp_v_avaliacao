@@ -1,11 +1,14 @@
 import { NextFunction, Request, Response } from "express";
 import { BadRequestError, NotFoundError } from "../../shared/helpers/api-erros";
+import { isValidData } from "../../shared/helpers/valid-marvel-response.helper";
 import { MARVEL_API_URL } from "../../shared/utils/constants";
 import { Character } from "../characters/entities/character.entity";
 import { Comic } from "../comics/entities/comic.entity";
 import { Creator } from "../creators/entities/creator.entity";
 import { Serie } from "../series/entities/serie.entity";
 import { serieRepository } from "../series/serie.repository";
+import { configRepository } from "./config.repository";
+import { Config } from "./entities/config.entity";
 
 interface ISeries {
   serieId: number;
@@ -59,6 +62,7 @@ export class SeedController {
       await queryRunner.manager.delete(Creator, {});
       await queryRunner.manager.delete(Character, {});
       await queryRunner.manager.delete(Comic, {});
+      await queryRunner.manager.delete(Config, {});
 
       await queryRunner.commitTransaction();
 
@@ -89,12 +93,19 @@ export class SeedController {
       const ts = "1";
       const hash = getHashMD5(ts, your_public_key, your_private_key);
 
+      await queryRunner.manager.save(Config, {
+        ts,
+        your_public_key,
+        your_private_key,
+        hash,
+      });
+
       const seriesResponse = await fetch(
         `${MARVEL_API_URL}/series?ts=${ts}&apikey=${your_public_key}&hash=${hash}&titleStartsWith=${saga}&limit=100`
       );
       const seriesData = await seriesResponse.json();
 
-      if (!isSeriesData(seriesData)) {
+      if (!isValidData(seriesData)) {
         throw new NotFoundError("Invalid series data");
       }
 
@@ -249,9 +260,9 @@ export class SeedController {
 }
 
 async function isAlreadySeeded() {
-  const seriesSeed = await serieRepository.find();
+  const config = await configRepository.find();
 
-  if (seriesSeed.length > 0) {
+  if (config.length > 0) {
     throw new BadRequestError("Database already seeded");
   }
 
@@ -265,16 +276,4 @@ function getHashMD5(ts: string, publicKey: string, privateKey: string): string {
   hash.update(stringHash);
 
   return hash.digest("hex");
-}
-
-function isSeriesData(data: any): data is { data: { results: any[] } } {
-  return (
-    typeof data === "object" &&
-    data !== null &&
-    "data" in data &&
-    typeof data.data === "object" &&
-    data.data !== null &&
-    "results" in data.data &&
-    Array.isArray(data.data.results)
-  );
 }
