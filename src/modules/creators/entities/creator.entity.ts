@@ -6,16 +6,13 @@ export class Creator {
   id: number;
 
   @Column()
-  resourceURI: string;
-
-  @Column()
   name: string;
 
   @Column()
   role: string;
 
   @Column()
-  seriesIds: string;
+  serieId: number;
 
   @Column()
   creatorId: number;

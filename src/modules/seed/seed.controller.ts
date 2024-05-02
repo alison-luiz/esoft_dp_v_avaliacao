@@ -16,14 +16,14 @@ interface ISeries {
   description: string;
   startYear: number;
   endYear: number;
-  thumbnailPath: string;
+  thumbnail: string;
+  thumbnailExtension: string;
   creators: ICreator[];
   characters: ICharacter[];
   comics: IComic[];
 }
 
 interface ICreator {
-  resourceURI: string;
   name: string;
   role: string;
   serieId: number;
@@ -31,7 +31,6 @@ interface ICreator {
 }
 
 interface ICharacter {
-  resourceURI: string;
   name: string;
   role: string;
   serieId: number;
@@ -39,7 +38,6 @@ interface ICharacter {
 }
 
 interface IComic {
-  resourceURI: string;
   name: string;
   role: string;
   serieId: number;
@@ -113,7 +111,6 @@ export class SeedController {
         (series: any) => {
           const filteredCreators: ICreator[] = series.creators.items.map(
             (creator: any) => ({
-              resourceURI: creator.resourceURI,
               name: creator.name,
               role: creator.role,
               serieId: series.id,
@@ -123,7 +120,6 @@ export class SeedController {
 
           const filteredCharacters: ICharacter[] = series.characters.items.map(
             (character: any) => ({
-              resourceURI: character.resourceURI,
               name: character.name,
               serieId: series.id,
               characterId: Number(character.resourceURI.split("/").pop()),
@@ -132,7 +128,6 @@ export class SeedController {
 
           const filteredComics: IComic[] = series.comics.items.map(
             (comic: any) => ({
-              resourceURI: comic.resourceURI,
               name: comic.name,
               serieId: series.id,
               comicId: Number(comic.resourceURI.split("/").pop()),
@@ -145,7 +140,8 @@ export class SeedController {
             description: series.description,
             startYear: series.startYear,
             endYear: series.endYear,
-            thumbnailPath: series.thumbnail.path,
+            thumbnail: series.thumbnail.path,
+            thumbnailExtension: series.thumbnail.extension,
             creators: filteredCreators,
             characters: filteredCharacters,
             comics: filteredComics,
@@ -160,7 +156,8 @@ export class SeedController {
           description: serie.description,
           startYear: serie.startYear,
           endYear: serie.endYear,
-          thumbnailPath: serie.thumbnailPath,
+          thumbnail: serie.thumbnail,
+          thumbnailExtension: serie.thumbnailExtension,
         });
 
         for (const character of serie.characters) {
@@ -173,7 +170,6 @@ export class SeedController {
 
           if (!existingCharacter) {
             await queryRunner.manager.save(Character, {
-              resourceURI: character.resourceURI,
               name: character.name,
               seriesIds: character.serieId.toString(),
               characterId: character.characterId,
@@ -201,31 +197,19 @@ export class SeedController {
 
         for (const creator of serie.creators) {
           const existingCreator = await queryRunner.manager.findOne(Creator, {
-            where: { creatorId: creator.creatorId },
+            where: { 
+              creatorId: creator.creatorId,
+              serieId: creator.serieId
+            },
           });
 
           if (!existingCreator) {
             await queryRunner.manager.save(Creator, {
-              resourceURI: creator.resourceURI,
               name: creator.name,
               role: creator.role,
-              seriesIds: creator.serieId.toString(),
+              serieId: creator.serieId,
               creatorId: creator.creatorId,
             });
-          } else {
-            const seriesIdsArray = existingCreator.seriesIds
-              .split(",")
-              .map((id) => parseInt(id));
-
-            if (!seriesIdsArray.includes(creator.serieId)) {
-              seriesIdsArray.push(creator.serieId);
-
-              const updatedSeriesIds = seriesIdsArray.join(",");
-
-              await queryRunner.manager.update(Creator, existingCreator.id, {
-                seriesIds: updatedSeriesIds,
-              });
-            }
           }
         }
 
@@ -236,7 +220,6 @@ export class SeedController {
 
           if (!existingComic) {
             await queryRunner.manager.save(Comic, {
-              resourceURI: comic.resourceURI,
               name: comic.name,
               serieId: comic.serieId,
               comicId: comic.comicId,

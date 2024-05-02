@@ -6,9 +6,6 @@ export class Comic {
   id: number;
 
   @Column()
-  resourceURI: string;
-
-  @Column()
   name: string;
 
   @Column()

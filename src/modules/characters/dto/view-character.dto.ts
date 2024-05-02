@@ -8,16 +8,13 @@ interface IViewCharacterDto {
   id: number;
   name: string;
   description: string;
-  thumbnail: {
-    path: string;
-    extension: string;
-  };
+  thumbnail: string;
+  thumbnailExtension: string;
   seriesIds: number[];
   series: Serie[];
   comics: Comic[];
   creators: Creator[];
   characterId: number;
-  resourceURI: string;
 }
 
 class ViewCharacterDto {
@@ -26,16 +23,13 @@ class ViewCharacterDto {
       id: character.id,
       name: character.name,
       description: filteredCharacter.description,
-      thumbnail: {
-        path: filteredCharacter.thumbnail.path,
-        extension: filteredCharacter.thumbnail.extension,
-      },
+      thumbnail: filteredCharacter.thumbnail,
+      thumbnailExtension: filteredCharacter.thumbnailExtension,
       seriesIds: character.seriesIds.split(',').map(id => parseInt(id)),
       series: series,
       comics: comics,
       creators: creators,
       characterId: character.characterId,
-      resourceURI: character.resourceURI,
     }
   }
 }

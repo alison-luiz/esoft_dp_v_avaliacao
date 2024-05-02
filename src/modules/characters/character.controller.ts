@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { In, Like } from "typeorm";
+import { In } from "typeorm";
 import { NotFoundError } from "../../shared/helpers/api-erros";
 import { isValidData } from "../../shared/helpers/valid-marvel-response.helper";
 import { MARVEL_API_URL } from "../../shared/utils/constants";
@@ -13,10 +13,8 @@ import ViewCharacterDto from "./dto/view-character.dto";
 
 export interface ICharacter {
   description: string;
-  thumbnail: {
-    path: string;
-    extension: string;
-  };
+  thumbnail: string;
+  thumbnailExtension: string;
 }
 
 export class CharacterController {
@@ -58,21 +56,45 @@ export class CharacterController {
         throw new NotFoundError("Character not found");
       }
 
-      const characterMarvelResponse = await fetch(
-        `${MARVEL_API_URL}/characters/${character.characterId}?apikey=${config[0].your_public_key}&hash=${config[0].hash}&ts=${config[0].ts}`
-      );
-      const characterMarvel = await characterMarvelResponse.json();
+      let filteredCharacter: ICharacter[] = [];
 
-      if (!isValidData(characterMarvel)) {
-        throw new NotFoundError("Character not found in Marvel API");
+      if (character.hasFetchData === false) {
+        const characterMarvelResponse = await fetch(
+          `${MARVEL_API_URL}/characters/${character.characterId}?apikey=${config[0].your_public_key}&hash=${config[0].hash}&ts=${config[0].ts}`
+        );
+        const characterMarvel = await characterMarvelResponse.json();
+  
+        if (!isValidData(characterMarvel)) {
+          throw new NotFoundError("Character not found in Marvel API");
+        }
+
+        filteredCharacter = characterMarvel.data.results.map(
+          (character: any) => ({
+            description: character.description,
+            thumbnail: character.thumbnail.path,
+            thumbnailExtension: character.thumbnail.extension,
+          })
+        );
+
+        await characterRepository.update(character.id, {
+          hasFetchData: true,
+          description: filteredCharacter[0].description,
+          thumbnail: filteredCharacter[0].thumbnail,
+          thumbnailExtension: filteredCharacter[0].thumbnailExtension,
+        });
+
+        character.description = filteredCharacter[0].description;
+        character.thumbnail = filteredCharacter[0].thumbnail;
+        character.thumbnailExtension = filteredCharacter[0].thumbnailExtension;
+      } else {
+        filteredCharacter = [
+          {
+            description: character.description,
+            thumbnail: character.thumbnail,
+            thumbnailExtension: character.thumbnailExtension,
+          },
+        ];
       }
-
-      const filteredCharacter: ICharacter[] = characterMarvel.data.results.map(
-        (character: any) => ({
-          description: character.description,
-          thumbnail: character.thumbnail,
-        })
-      );
 
       const seriesIds = character.seriesIds.split(",").map((id) => parseInt(id));
 
@@ -86,7 +108,7 @@ export class CharacterController {
 
       const creators = await creatorRepository.find({
         where: {
-          seriesIds: Like(`%${seriesIds}%`),
+          serieId: In(seriesIds),
         }
       });
 

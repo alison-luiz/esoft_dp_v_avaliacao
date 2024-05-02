@@ -2,12 +2,12 @@ import { NextFunction, Request, Response } from "express";
 import { FindManyOptions } from "typeorm";
 import { NotFoundError } from "../../shared/helpers/api-erros";
 import { creatorRepository } from "./creator.repository";
-
+import { QueryGetAllDto } from "./dto/query-get-all.dto";
 
 export class CreatorController {
   async getAll(req: Request, res: Response, next: NextFunction) {
     try {
-      let options: FindManyOptions<any> = {};
+      let options: FindManyOptions<QueryGetAllDto> = {};
 
       Object.keys(req.query).forEach((param) => {
         options.where = { ...options.where, [param]: req.query[param] };

@@ -6,9 +6,6 @@ export class Character {
   id: number;
 
   @Column()
-  resourceURI: string;
-
-  @Column()
   name: string;
 
   @Column()
@@ -16,4 +13,16 @@ export class Character {
 
   @Column()
   characterId: number;
+
+  @Column({ default: false })
+  hasFetchData: boolean;
+
+  @Column({ nullable: true })
+  description: string;
+
+  @Column({ nullable: true })
+  thumbnail: string;
+
+  @Column({ nullable: true })
+  thumbnailExtension: string;
 }

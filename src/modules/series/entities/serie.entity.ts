@@ -20,6 +20,9 @@ export class Serie {
   @Column()
   endYear: number;
 
-  @Column()
-  thumbnailPath: string;
+  @Column({ nullable: true })
+  thumbnail: string;
+
+  @Column({ nullable: true })
+  thumbnailExtension: string;
 }
