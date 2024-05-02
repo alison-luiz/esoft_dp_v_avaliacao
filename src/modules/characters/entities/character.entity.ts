@@ -12,7 +12,7 @@ export class Character {
   name: string;
 
   @Column()
-  serieId: number;
+  seriesIds: string;
 
   @Column()
   characterId: number;

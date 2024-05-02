@@ -46,7 +46,6 @@ interface IComic {
 export class SeedController {
   constructor() {
     this.seed = this.seed.bind(this);
-    this.getHashMD5 = this.getHashMD5.bind(this);
   }
 
   async reset(req: Request, res: Response, next: NextFunction) {
@@ -73,18 +72,14 @@ export class SeedController {
   }
 
   async seed(req: Request, res: Response, next: NextFunction) {
-    const seriesSeed = await serieRepository.find();
-
-    if (seriesSeed.length > 0) {
-      throw new BadRequestError("Database already seeded");
-    }
-
     const queryRunner = serieRepository.manager.connection.createQueryRunner();
 
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
+      await isAlreadySeeded();
+
       const { your_public_key, your_private_key, saga } = req.body;
 
       if (!your_public_key || !your_private_key || !saga) {
@@ -92,7 +87,7 @@ export class SeedController {
       }
 
       const ts = "1";
-      const hash = this.getHashMD5(ts, your_public_key, your_private_key);
+      const hash = getHashMD5(ts, your_public_key, your_private_key);
 
       const seriesResponse = await fetch(
         `${MARVEL_API_URL}/series?ts=${ts}&apikey=${your_public_key}&hash=${hash}&titleStartsWith=${saga}&limit=100`
@@ -157,42 +152,77 @@ export class SeedController {
           thumbnailPath: serie.thumbnailPath,
         });
 
-        for (const creator of serie.creators) {
-          const existingCreator = await queryRunner.manager.findOne(Creator, {
-            where: { creatorId: creator.creatorId, serieId: creator.serieId }
-          });
-        
-          if (!existingCreator || existingCreator.role !== creator.role) {
-            await queryRunner.manager.save(Creator, {
-              resourceURI: creator.resourceURI,
-              name: creator.name,
-              role: creator.role,
-              serieId: creator.serieId,
-              creatorId: creator.creatorId,
-            });
-          }
-        }
-        
         for (const character of serie.characters) {
-          const existingCharacter = await queryRunner.manager.findOne(Character, {
-            where: { characterId: character.characterId }
-          });
-        
+          const existingCharacter = await queryRunner.manager.findOne(
+            Character,
+            {
+              where: { characterId: character.characterId },
+            }
+          );
+
           if (!existingCharacter) {
             await queryRunner.manager.save(Character, {
               resourceURI: character.resourceURI,
               name: character.name,
-              serieId: character.serieId,
+              seriesIds: character.serieId.toString(),
               characterId: character.characterId,
             });
+          } else {
+            const seriesIdsArray = existingCharacter.seriesIds
+              .split(",")
+              .map((id) => parseInt(id));
+
+            if (!seriesIdsArray.includes(character.serieId)) {
+              seriesIdsArray.push(character.serieId);
+
+              const updatedSeriesIds = seriesIdsArray.join(",");
+
+              await queryRunner.manager.update(
+                Character,
+                existingCharacter.id,
+                {
+                  seriesIds: updatedSeriesIds,
+                }
+              );
+            }
           }
-        }        
+        }
+
+        for (const creator of serie.creators) {
+          const existingCreator = await queryRunner.manager.findOne(Creator, {
+            where: { creatorId: creator.creatorId },
+          });
+
+          if (!existingCreator) {
+            await queryRunner.manager.save(Creator, {
+              resourceURI: creator.resourceURI,
+              name: creator.name,
+              role: creator.role,
+              seriesIds: creator.serieId.toString(),
+              creatorId: creator.creatorId,
+            });
+          } else {
+            const seriesIdsArray = existingCreator.seriesIds
+              .split(",")
+              .map((id) => parseInt(id));
+
+            if (!seriesIdsArray.includes(creator.serieId)) {
+              seriesIdsArray.push(creator.serieId);
+
+              const updatedSeriesIds = seriesIdsArray.join(",");
+
+              await queryRunner.manager.update(Creator, existingCreator.id, {
+                seriesIds: updatedSeriesIds,
+              });
+            }
+          }
+        }
 
         for (const comic of serie.comics) {
           const existingComic = await queryRunner.manager.findOne(Comic, {
-            where: { comicId: comic.comicId }
+            where: { comicId: comic.comicId },
           });
-        
+
           if (!existingComic) {
             await queryRunner.manager.save(Comic, {
               resourceURI: comic.resourceURI,
@@ -201,12 +231,14 @@ export class SeedController {
               comicId: comic.comicId,
             });
           }
-        }        
+        }
       }
 
       await queryRunner.commitTransaction();
 
-      res.json(filteredSeries);
+      res.json({
+        message: `Database seeded with ${filteredSeries.length} series from ${saga}`,
+      });
     } catch (error) {
       await queryRunner.rollbackTransaction();
       next(error);
@@ -214,19 +246,25 @@ export class SeedController {
       await queryRunner.release();
     }
   }
+}
 
-  private getHashMD5(
-    ts: string,
-    publicKey: string,
-    privateKey: string
-  ): string {
-    const crypto = require("crypto");
-    const stringHash = `${ts}${privateKey}${publicKey}`;
-    const hash = crypto.createHash("md5");
-    hash.update(stringHash);
+async function isAlreadySeeded() {
+  const seriesSeed = await serieRepository.find();
 
-    return hash.digest("hex");
+  if (seriesSeed.length > 0) {
+    throw new BadRequestError("Database already seeded");
   }
+
+  return;
+}
+
+function getHashMD5(ts: string, publicKey: string, privateKey: string): string {
+  const crypto = require("crypto");
+  const stringHash = `${ts}${privateKey}${publicKey}`;
+  const hash = crypto.createHash("md5");
+  hash.update(stringHash);
+
+  return hash.digest("hex");
 }
 
 function isSeriesData(data: any): data is { data: { results: any[] } } {

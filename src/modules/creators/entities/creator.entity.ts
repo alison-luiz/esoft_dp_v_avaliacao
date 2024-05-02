@@ -15,7 +15,7 @@ export class Creator {
   role: string;
 
   @Column()
-  serieId: number;
+  seriesIds: string;
 
   @Column()
   creatorId: number;

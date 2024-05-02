@@ -3,6 +3,7 @@ import { charactersRoutes } from './routes/characters.route';
 import { comicsRoutes } from './routes/comics.route';
 import { creatorsRoutes } from './routes/creators.route';
 import { seedRoutes } from './routes/seed.route';
+import { seriesRoutes } from './routes/series.route';
 import { AppDataSource } from './src/shared/database/database.config';
 import { errorMiddleware } from './src/shared/middlewares/error.middleware';
 
@@ -37,6 +38,7 @@ class App {
     this.express.use(charactersRoutes);
     this.express.use(comicsRoutes);
     this.express.use(creatorsRoutes);
+    this.express.use(seriesRoutes);
   }
 
   private errorHandling(): void {
