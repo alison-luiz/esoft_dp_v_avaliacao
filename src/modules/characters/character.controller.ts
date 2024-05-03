@@ -146,11 +146,17 @@ export class CharacterController {
         throw new NotFoundError("Series not found");
       }
 
+      let characterId;
+
+      do {
+        characterId = Math.floor(Math.random() * 1000000);
+      } while (await characterRepository.findOne({ where: { characterId } }));
+
       const character = await characterRepository.save({
         name,
         seriesIds,
         hasFetchData: true,
-        characterId: 0,
+        characterId: characterId,
         description,
         thumbnail,
         thumbnailExtension,

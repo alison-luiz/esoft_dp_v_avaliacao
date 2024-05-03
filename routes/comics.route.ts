@@ -6,6 +6,9 @@ const comicsRoutes = Router()
 
 comicsRoutes.get('/comics', new ComicController().getAll)
 comicsRoutes.get('/comics/:id', new ComicController().getById)
+comicsRoutes.post('/comics', new ComicController().create)
+comicsRoutes.put('/comics/:id', new ComicController().update)
+comicsRoutes.delete('/comics/:id', new ComicController().delete)
 
 comicsRoutes.use(errorMiddleware)
 

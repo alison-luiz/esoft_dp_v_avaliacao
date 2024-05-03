@@ -16,4 +16,13 @@ export class Creator {
 
   @Column()
   creatorId: number;
+
+  @Column({ default: false })
+  hasFetchData: boolean;
+
+  @Column({ nullable: true })
+  thumbnail: string;
+
+  @Column({ nullable: true })
+  thumbnailExtension: string;
 }

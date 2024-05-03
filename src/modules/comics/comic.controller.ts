@@ -95,4 +95,94 @@ export class ComicController {
       next(error);
     }
   }
+
+  async create(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { name, serieId, description, thumbnail, thumbnailExtension } = req.body;
+
+      if (!name || !serieId || !description || !thumbnail || !thumbnailExtension) {
+        throw new NotFoundError("Missing required fields");
+      }
+
+      const serieExists = await serieRepository.findOne({
+        where: { serieId: serieId },
+      });
+
+      if (!serieExists) {
+        throw new NotFoundError("Serie not found");
+      }
+
+      let comicId;
+
+      do {
+        comicId = Math.floor(Math.random() * 1000000);
+      } while (await comicRepository.findOne({ where: { comicId } }));
+
+      const comic = await comicRepository.save({
+        comicId: comicId,
+        name,
+        serieId,
+        hasFetchData: true,
+        description,
+        thumbnail,
+        thumbnailExtension,
+      });
+
+      res.status(201).json(comic);      
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+
+      const { name, serieId, description, thumbnail, thumbnailExtension } = req.body;
+
+      if (!name || !serieId || !description || !thumbnail || !thumbnailExtension) {
+        throw new NotFoundError("Missing required fields");
+      }
+
+      const comic = await comicRepository.findOne({
+        where: { id: Number(id) },
+      });
+
+      if (!comic) {
+        throw new NotFoundError("Comic not found");
+      }
+
+      comic.name = name;
+      comic.serieId = serieId;
+      comic.description = description;
+      comic.thumbnail = thumbnail;
+      comic.thumbnailExtension = thumbnailExtension;
+
+      await comicRepository.save(comic);
+
+      res.status(200).json(comic);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async delete(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+
+      const comic = await comicRepository.findOne({
+        where: { id: Number(id) },
+      });
+
+      if (!comic) {
+        throw new NotFoundError("Comic not found");
+      }
+
+      await comicRepository.delete(comic.id);
+
+      res.status(200).json({ message: "Comic deleted" });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
