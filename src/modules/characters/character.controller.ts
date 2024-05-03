@@ -59,10 +59,10 @@ export class CharacterController {
       let filteredCharacter: ICharacter[] = [];
 
       if (character.hasFetchData === false) {
-        const characterMarvelResponse = await fetch(
+        const response = await fetch(
           `${MARVEL_API_URL}/characters/${character.characterId}?apikey=${config[0].your_public_key}&hash=${config[0].hash}&ts=${config[0].ts}`
         );
-        const characterMarvel = await characterMarvelResponse.json();
+        const characterMarvel = await response.json();
 
         if (!isValidData(characterMarvel)) {
           throw new NotFoundError("Character not found in Marvel API");
@@ -123,6 +123,102 @@ export class CharacterController {
       );
 
       res.status(200).json(characterMarvelDto);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async create(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { name, seriesIds, description, thumbnail, thumbnailExtension } = req.body;
+
+      if (!name || !seriesIds || !description || !thumbnail || !thumbnailExtension) {
+        throw new NotFoundError("Missing required fields");
+      }
+
+      const seriesIdsArray = seriesIds.split(",").map((id: string) => parseInt(id));
+
+      const seriesExists = await serieRepository.find({
+        where: { serieId: In(seriesIdsArray) },
+      });
+
+      if (seriesExists.length !== seriesIdsArray.length) {
+        throw new NotFoundError("Series not found");
+      }
+
+      const character = await characterRepository.save({
+        name,
+        seriesIds,
+        hasFetchData: true,
+        characterId: 0,
+        description,
+        thumbnail,
+        thumbnailExtension,
+      });
+
+      res.status(201).json(character);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+
+      const { name, seriesIds, description, thumbnail, thumbnailExtension } = req.body;
+
+      if (!name || !seriesIds || !description || !thumbnail || !thumbnailExtension) {
+        throw new NotFoundError("Missing required fields");
+      }
+
+      const seriesIdsArray = seriesIds.split(",").map((id: string) => parseInt(id));
+
+      const seriesExists = await serieRepository.find({
+        where: { serieId: In(seriesIdsArray) },
+      });
+
+      if (seriesExists.length !== seriesIdsArray.length) {
+        throw new NotFoundError("Series not found");
+      }
+
+      const character = await characterRepository.findOne({
+        where: { id: Number(id) },
+      });
+
+      if (!character) {
+        throw new NotFoundError("Character not found");
+      }
+
+      character.name = name;
+      character.seriesIds = seriesIds;
+      character.description = description;
+      character.thumbnail = thumbnail;
+      character.thumbnailExtension = thumbnailExtension;
+
+      await characterRepository.save(character);
+
+      res.status(200).json(character);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async delete(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+
+      const character = await characterRepository.findOne({
+        where: { id: Number(id) },
+      });
+
+      if (!character) {
+        throw new NotFoundError("Character not found");
+      }
+
+      await characterRepository.delete(character.id);
+
+      res.status(200).json({ message: "Character deleted" });
     } catch (error) {
       next(error);
     }

@@ -27,14 +27,20 @@ export class SerieController {
 
   async create(req: Request, res: Response, next: NextFunction) {
     try {
-      const { serieId, title, description, startYear, endYear, thumbnail, thumbnailExtension } = req.body;
+      const { title, description, startYear, endYear, thumbnail, thumbnailExtension } = req.body;
 
-      if (!serieId || !title || !description || !startYear || !endYear || !thumbnail || !thumbnailExtension) {
+      if (!title || !description || !startYear || !endYear || !thumbnail || !thumbnailExtension) {
         throw new NotFoundError("Missing required fields");
       }
+      
+      let serieId;
+
+      do {
+        serieId = Math.floor(Math.random() * 1000000);
+      } while (await serieRepository.findOne({ where: { serieId } }));
 
       const serie = await serieRepository.save({
-        serieId,
+        serieId: serieId,
         title,
         description,
         startYear,
@@ -53,9 +59,9 @@ export class SerieController {
     try {
       const { id } = req.params;
 
-      const { serieId, title, description, startYear, endYear, thumbnail, thumbnailExtension } = req.body;
+      const { title, description, startYear, endYear, thumbnail, thumbnailExtension } = req.body;
 
-      if (!serieId || !title || !description || !startYear || !endYear || !thumbnail || !thumbnailExtension) {
+      if (!title || !description || !startYear || !endYear || !thumbnail || !thumbnailExtension) {
         throw new NotFoundError("Missing required fields");
       }
 
@@ -96,7 +102,7 @@ export class SerieController {
 
       await serieRepository.delete(serie);
 
-      res.status(204).end();
+      res.status(200).json({ message: "Serie deleted" });
     } catch (error) {
       next(error);
     }
