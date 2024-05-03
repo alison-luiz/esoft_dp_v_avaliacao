@@ -22,7 +22,7 @@ export class CharacterController {
     try {
       const characters = await characterRepository.find();
 
-      if (!characters) {
+      if (!characters || characters.length === 0) {
         throw new NotFoundError("Characters not found");
       }
 
@@ -39,13 +39,13 @@ export class CharacterController {
   }
 
   async getById(req: Request, res: Response, next: NextFunction) {
-    const config = await configRepository.find();
-
-    if (!config) {
-      throw new NotFoundError("Config not found");
-    }
-
     try {
+      const config = await configRepository.find();
+
+      if (!config || config.length === 0) {
+        throw new NotFoundError("Config not found, please run seed first");
+      }
+
       const { id } = req.params;
 
       const character = await characterRepository.findOne({
@@ -63,7 +63,7 @@ export class CharacterController {
           `${MARVEL_API_URL}/characters/${character.characterId}?apikey=${config[0].your_public_key}&hash=${config[0].hash}&ts=${config[0].ts}`
         );
         const characterMarvel = await characterMarvelResponse.json();
-  
+
         if (!isValidData(characterMarvel)) {
           throw new NotFoundError("Character not found in Marvel API");
         }
@@ -96,7 +96,9 @@ export class CharacterController {
         ];
       }
 
-      const seriesIds = character.seriesIds.split(",").map((id) => parseInt(id));
+      const seriesIds = character.seriesIds
+        .split(",")
+        .map((id) => parseInt(id));
 
       const series = await serieRepository.find({
         where: { serieId: In(seriesIds) },
@@ -109,10 +111,16 @@ export class CharacterController {
       const creators = await creatorRepository.find({
         where: {
           serieId: In(seriesIds),
-        }
+        },
       });
 
-      const characterMarvelDto = ViewCharacterDto.build(character, filteredCharacter[0], series, comics, creators);
+      const characterMarvelDto = ViewCharacterDto.build(
+        character,
+        filteredCharacter[0],
+        series,
+        comics,
+        creators
+      );
 
       res.status(200).json(characterMarvelDto);
     } catch (error) {

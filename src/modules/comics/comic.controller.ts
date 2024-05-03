@@ -7,7 +7,7 @@ export class ComicController {
     try {
       const comics = await comicRepository.find();
 
-      if (!comics) {
+      if (!comics || comics.length === 0) {
         throw new NotFoundError("Comics not found");
       }
 

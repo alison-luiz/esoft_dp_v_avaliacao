@@ -28,6 +28,11 @@ export class CreatorController {
   async getRolesTypes(req: Request, res: Response, next: NextFunction) {
     try {
       const creators = await creatorRepository.find();
+
+      if (!creators || creators.length === 0) {
+        throw new NotFoundError("Creators not found");
+      }
+
       const roles = creators.map((creator) => creator.role);
       const rolesTypes = [...new Set(roles)];
 
