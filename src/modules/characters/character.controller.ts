@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { In } from "typeorm";
-import { NotFoundError } from "../../shared/helpers/api-erros";
+import { BadRequestError, NotFoundError } from "../../shared/helpers/api-erros";
 import { isValidData } from "../../shared/helpers/valid-marvel-response.helper";
 import { MARVEL_API_URL } from "../../shared/utils/constants";
 import { comicRepository } from "../comics/comic.repository";
@@ -133,7 +133,7 @@ export class CharacterController {
       const { name, seriesIds, description, thumbnail, thumbnailExtension } = req.body;
 
       if (!name || !seriesIds || !description || !thumbnail || !thumbnailExtension) {
-        throw new NotFoundError("Missing required fields");
+        throw new BadRequestError("Missing required fields");
       }
 
       const seriesIdsArray = seriesIds.split(",").map((id: string) => parseInt(id));
@@ -175,7 +175,7 @@ export class CharacterController {
       const { name, seriesIds, description, thumbnail, thumbnailExtension } = req.body;
 
       if (!name || !seriesIds || !description || !thumbnail || !thumbnailExtension) {
-        throw new NotFoundError("Missing required fields");
+        throw new BadRequestError("Missing required fields");
       }
 
       const seriesIdsArray = seriesIds.split(",").map((id: string) => parseInt(id));

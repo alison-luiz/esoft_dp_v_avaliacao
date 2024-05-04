@@ -117,6 +117,8 @@ creatorsRoutes.get('/creators/:id', new CreatorController().getById)
  *         description: Criador criado com sucesso.
  *       400:
  *         description: Requisição inválida.
+ *       404:
+ *         description: Série não encontrada.
  */
 creatorsRoutes.post('/creators', new CreatorController().create)
 
@@ -145,6 +147,8 @@ creatorsRoutes.post('/creators', new CreatorController().create)
  *         description: Criador atualizado com sucesso.
  *       400:
  *         description: Requisição inválida.
+ *       404:
+ *         description: Criador não encontrado.
  */
 creatorsRoutes.put('/creators/:id', new CreatorController().update)
 

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { FindManyOptions } from "typeorm";
-import { NotFoundError } from "../../shared/helpers/api-erros";
+import { BadRequestError, NotFoundError } from "../../shared/helpers/api-erros";
 import { QuerySeriesGetAllDto } from "./dto/query-get-all.dto";
 import { serieRepository } from "./serie.repository";
 
@@ -30,7 +30,7 @@ export class SerieController {
       const { title, description, startYear, endYear, thumbnail, thumbnailExtension } = req.body;
 
       if (!title || !description || !startYear || !endYear || !thumbnail || !thumbnailExtension) {
-        throw new NotFoundError("Missing required fields");
+        throw new BadRequestError("Missing required fields");
       }
       
       let serieId;
@@ -62,7 +62,7 @@ export class SerieController {
       const { title, description, startYear, endYear, thumbnail, thumbnailExtension } = req.body;
 
       if (!title || !description || !startYear || !endYear || !thumbnail || !thumbnailExtension) {
-        throw new NotFoundError("Missing required fields");
+        throw new BadRequestError("Missing required fields");
       }
 
       const serie = await serieRepository.findOne({

@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { NotFoundError } from "../../shared/helpers/api-erros";
+import { BadRequestError, NotFoundError } from "../../shared/helpers/api-erros";
 import { isValidData } from "../../shared/helpers/valid-marvel-response.helper";
 import { MARVEL_API_URL } from "../../shared/utils/constants";
 import { configRepository } from "../seed/config.repository";
@@ -101,7 +101,7 @@ export class ComicController {
       const { name, serieId, description, thumbnail, thumbnailExtension } = req.body;
 
       if (!name || !serieId || !description || !thumbnail || !thumbnailExtension) {
-        throw new NotFoundError("Missing required fields");
+        throw new BadRequestError("Missing required fields");
       }
 
       const serieExists = await serieRepository.findOne({
@@ -141,7 +141,7 @@ export class ComicController {
       const { name, serieId, description, thumbnail, thumbnailExtension } = req.body;
 
       if (!name || !serieId || !description || !thumbnail || !thumbnailExtension) {
-        throw new NotFoundError("Missing required fields");
+        throw new BadRequestError("Missing required fields");
       }
 
       const comic = await comicRepository.findOne({
