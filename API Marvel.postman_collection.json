@@ -1,0 +1,570 @@
+{
+	"info": {
+		"_postman_id": "a21d557a-3d7c-4fd2-8616-41a9a5ce81d9",
+		"name": "API Marvel",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27403992"
+	},
+	"item": [
+		{
+			"name": "Seed",
+			"item": [
+				{
+					"name": "Seed DB",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"your_public_key\": \"842d46a23150eeb700303ab80ebddc12\",\r\n    \"your_private_key\": \"8a19078812325eb4caa58ccb54def553bc46474c\",\r\n    \"saga\": \"Civil War\"\r\n} // Essa request demora em média 2 minutos para semear as informações no banco de dados",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/seed",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"seed"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset DB",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/reset",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"reset"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Series (Sagas)",
+			"item": [
+				{
+					"name": "Get Series",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/series?startYear=2006&endYear=2099",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"series"
+							],
+							"query": [
+								{
+									"key": "startYear",
+									"value": "2006"
+								},
+								{
+									"key": "endYear",
+									"value": "2099"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Serie",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"New Serie\",\r\n    \"description\": \"Test\",\r\n    \"startYear\": 2000,\r\n    \"endYear\": 2000,\r\n    \"thumbnail\": \"http://image.com.br\",\r\n    \"thumbnailExtension\": \"jpg\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/series",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"series"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit Serie",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"New Serie Edit\",\r\n    \"description\": \"Test Edit\",\r\n    \"startYear\": 2005,\r\n    \"endYear\": 2005,\r\n    \"thumbnail\": \"http://image.com.br\",\r\n    \"thumbnailExtension\": \"jpg\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/series/94",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"series",
+								"94"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Serie",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/series/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"series",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Characters",
+			"item": [
+				{
+					"name": "Get Characters",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/characters",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"characters"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Character by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/characters/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"characters",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Character",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Alison\",\r\n    \"seriesIds\": \"635335\", // Incluir as series (sagas) separadas por vírgula (serieId)\r\n    \"description\": \"Test\",\r\n    \"thumbnail\": \"http://image.com.br\",\r\n    \"thumbnailExtension\": \"jpg\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/characters",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"characters"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit Character",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Alison Edit\",\r\n    \"seriesIds\": \"635335\", // Incluir as series (sagas) separadas por vírgula (serieId)\r\n    \"description\": \"Test Edit\",\r\n    \"thumbnail\": \"http://image.com.br\",\r\n    \"thumbnailExtension\": \"jpg\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/characters/94",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"characters",
+								"94"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Character",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/characters/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"characters",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Comics",
+			"item": [
+				{
+					"name": "Get Comics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/comics",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"comics"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Comic ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/comics/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"comics",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Comic",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Alison\",\r\n    \"serieId\": 1067,\r\n    \"description\": \"Test\",\r\n    \"thumbnail\": \"http://image.com.br\",\r\n    \"thumbnailExtension\": \"jpg\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/comics",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"comics"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit Comic",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Alison Edit\",\r\n    \"serieId\": 1067,\r\n    \"description\": \"Test\",\r\n    \"thumbnail\": \"http://image.com.br\",\r\n    \"thumbnailExtension\": \"jpg\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/comics/451",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"comics",
+								"451"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Comic",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/comics/451",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"comics",
+								"451"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Creators",
+			"item": [
+				{
+					"name": "Get Creators",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/creators",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"creators"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "John Dell",
+									"disabled": true
+								},
+								{
+									"key": "role",
+									"value": "inker",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Role Types",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/creators/roles",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"creators",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Creator ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/creators/1173",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"creators",
+								"1173"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Creator",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Alison\",\r\n    \"role\": \"Test\",\r\n    \"serieId\": 1067,\r\n    \"thumbnail\": \"http://image.com.br\",\r\n    \"thumbnailExtension\": \"jpg\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/creators",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"creators"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit Creator",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Alison Edit\",\r\n    \"role\": \"Test\",\r\n    \"serieId\": 1067,\r\n    \"thumbnail\": \"http://image.com.br\",\r\n    \"thumbnailExtension\": \"jpg\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/creators/1764",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"creators",
+								"1764"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Creator",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/creators/1764",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"creators",
+								"1764"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Test Marvel API",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://gateway.marvel.com/v1/public/series?ts=1&apikey=842d46a23150eeb700303ab80ebddc12&hash=c2a79d6baaef8769b9b6c47c6f61c3b0",
+					"protocol": "http",
+					"host": [
+						"gateway",
+						"marvel",
+						"com"
+					],
+					"path": [
+						"v1",
+						"public",
+						"series"
+					],
+					"query": [
+						{
+							"key": "ts",
+							"value": "1"
+						},
+						{
+							"key": "apikey",
+							"value": "842d46a23150eeb700303ab80ebddc12"
+						},
+						{
+							"key": "hash",
+							"value": "c2a79d6baaef8769b9b6c47c6f61c3b0"
+						},
+						{
+							"key": "titleStartsWith",
+							"value": "Civil War",
+							"disabled": true
+						},
+						{
+							"key": "limit",
+							"value": "100",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
