@@ -10,7 +10,6 @@ import { seriesRoutes } from './routes/series.route';
 import { AppDataSource } from './src/shared/database/database.config';
 import { errorMiddleware } from './src/shared/middlewares/error.middleware';
 
-
 class App {
   public express: express.Application;
 
@@ -23,22 +22,20 @@ class App {
     this.setupSwagger();
   }
 
-  private middleware(): void {
+  public middleware(): void {
     this.express.use(express.json());
   }
 
-  private async database() {
-    AppDataSource
-      .initialize()
-      .then(() => {
-        console.log("Data Source has been initialized!");
-      })
-      .catch((err) => {
-        console.error("Error during Data Source initialization:", err);
-      });
+  public async database(): Promise<void> {
+    try {
+      await AppDataSource.initialize();
+      console.log("Data Source has been initialized!");
+    } catch (err) {
+      console.error("Error during Data Source initialization:", err);
+    }
   }
 
-  private routes(): void {
+  public routes(): void {
     this.express.use(seedRoutes);
     this.express.use(charactersRoutes);
     this.express.use(comicsRoutes);
@@ -46,11 +43,11 @@ class App {
     this.express.use(seriesRoutes);
   }
 
-  private errorHandling(): void {
+  public errorHandling(): void {
     this.express.use(errorMiddleware);
   }
 
-  private setupSwagger(): void {
+  public setupSwagger(): void {
     const options = {
       definition: {
         openapi: '3.1.0',

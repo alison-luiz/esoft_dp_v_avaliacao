@@ -15,7 +15,7 @@ const charactersRoutes = Router()
  *         - seriesIds
  *       properties:
  *         id:
- *           type: string
+ *           type: number
  *           description: ID do personagem.
  *         name:
  *           type: string
